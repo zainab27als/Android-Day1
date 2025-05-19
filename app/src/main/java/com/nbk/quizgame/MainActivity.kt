@@ -18,6 +18,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +42,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun QuizScreen() {
+    val questions = listOf(
+        "Android is an operating system." to true,
+        "The sun is cold." to false,
+        "Kotlin is used for Android development." to true
+    )
+
+    var questionIndex by remember { mutableStateOf(0) }
+    var selectedAnswer by remember { mutableStateOf<Boolean?>(null) }
+
+    val currentQuestion = questions[questionIndex].first
+    val correctAnswer = questions[questionIndex].second
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +63,7 @@ fun QuizScreen() {
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
-                text = "Android is an operating system.",
+                text = currentQuestion,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -55,44 +71,56 @@ fun QuizScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Text("True")
-                }
+            if (selectedAnswer == null || selectedAnswer == false) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = { selectedAnswer = true },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Text("True")
+                    }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Text("False")
+                    Button(
+                        onClick = { selectedAnswer = false },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Text("False")
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007C91))
-            ) {
-                Text(text = "Next Question", color = Color.White)
+            if (selectedAnswer == correctAnswer) {
+                Button(
+                    onClick = {
+                        if (questionIndex < questions.lastIndex) {
+                            questionIndex++
+                            selectedAnswer = null
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007C91))
+                ) {
+                    Text(text = "Next Question", color = Color.White)
+                }
             }
         }
 
-//        CorrectAnswerText(modifier = Modifier.align(Alignment.Center))
-//         WrongAnswerText(modifier = Modifier.align(Alignment.Center))
+        if (selectedAnswer == true && correctAnswer) {
+            CorrectAnswerText(modifier = Modifier.align(Alignment.Center))
+        } else if (selectedAnswer != null && selectedAnswer != correctAnswer) {
+            WrongAnswerText(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 
