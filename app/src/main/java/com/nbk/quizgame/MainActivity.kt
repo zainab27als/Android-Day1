@@ -71,7 +71,7 @@ fun QuizScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (selectedAnswer == null || selectedAnswer == false) {
+            if (selectedAnswer == null || selectedAnswer != correctAnswer) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = { selectedAnswer = true },
@@ -97,13 +97,11 @@ fun QuizScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (selectedAnswer == correctAnswer) {
+            if (selectedAnswer == correctAnswer && selectedAnswer != null) {
                 Button(
                     onClick = {
-                        if (questionIndex < questions.lastIndex) {
-                            questionIndex++
-                            selectedAnswer = null
-                        }
+                        questionIndex = (questionIndex + 1) % questions.size
+                        selectedAnswer = null
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,12 +109,14 @@ fun QuizScreen() {
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007C91))
                 ) {
-                    Text(text = "Next Question", color = Color.White)
+                    val buttonText = if (questionIndex == questions.lastIndex) "Restart" else "Next Question"
+                    Text(text = buttonText, color = Color.White)
                 }
             }
+
         }
 
-        if (selectedAnswer == true && correctAnswer) {
+        if (selectedAnswer == correctAnswer && selectedAnswer != null) {
             CorrectAnswerText(modifier = Modifier.align(Alignment.Center))
         } else if (selectedAnswer != null && selectedAnswer != correctAnswer) {
             WrongAnswerText(modifier = Modifier.align(Alignment.Center))
